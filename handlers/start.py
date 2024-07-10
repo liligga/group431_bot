@@ -35,7 +35,6 @@ async def about_us(callback: types.CallbackQuery):
     await callback.message.answer("О нас")
 
 
-
 @start_router.callback_query(F.data == "donate_us")
 async def donate_us(callback: types.CallbackQuery):
     await callback.message.answer("Спасибо за поддержку! ")

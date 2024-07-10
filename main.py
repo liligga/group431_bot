@@ -6,11 +6,13 @@ from handlers.start import start_router
 from handlers.shop import shop_router
 from handlers.echo import echo_router
 from handlers.pictures import picture_router
+from handlers.survey import survey_router
 
 
 async def main():
     # регистрация роутеров
     dp.include_router(start_router)
+    dp.include_router(survey_router)
     dp.include_router(shop_router)
     dp.include_router(picture_router)
 
