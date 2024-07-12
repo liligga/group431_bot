@@ -3,6 +3,8 @@ from aiogram.filters.command import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
+from bot_config import database
+
 
 survey_router = Router()
 
@@ -65,6 +67,12 @@ async def process_gender(message: types.Message, state: FSMContext):
 async def process_genre(message: types.Message, state: FSMContext):
     await state.update_data(genre=message.text)
     data = await state.get_data()
-    print(data)
+    print(data['gender'])
+    database.execute("""
+        INSERT INTO  survey_results(name, age, gender, genre)
+        VALUES (?, ?, ?, ?)
+    """, (data['name'], data['age'], data['gender'], data['genre']))
+
+    # очистить состояние
     await state.clear()
     await message.answer("Спасибо за пройденный опрос")
