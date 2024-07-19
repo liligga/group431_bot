@@ -26,7 +26,9 @@ async def show_genres(message: types.Message):
     )
 
 
-@shop_router.message(F.text.lower() == "детектив")
+GENRES = ("детектив", "фантастика", "триллер")
+
+@shop_router.message(F.text.lower().in_(GENRES))
 async def horror_handler(message: types.Message):
     kb = types.ReplyKeyboardRemove()
     sqlquery = """
@@ -34,18 +36,22 @@ async def horror_handler(message: types.Message):
         JOIN genres ON genres.id=books.genre_id
         WHERE genres.name = ?
     """
-    genre = 'детектив'
+    genre = message.text.lower()
+    print("Genre    ", genre)
 
     books = database.fetch(
         query=sqlquery,
         params=(genre,)
     )
     print(books)
-    await message.answer("Книги жанра детектив", reply_markup=kb)
-    for book in books:
-        await message.answer(f"Название: book[1]\nЦена: book[2")
+    if not books:
+        await message.answer("К сожалению нет книг этого жанра")
 
-@shop_router.message(F.text.lower() == "фантастика")
-async def fantasy_handler(message: types.Message):
-    kb = types.ReplyKeyboardRemove()
-    await message.answer("Книги жанра фантастика", reply_markup=kb)
+    await message.answer(f"Книги жанра {genre}", reply_markup=kb)
+    for book in books:
+        photo=types.FSInputFile(book.get('cover'))
+        # await message.answer(f"Название:{book.get('name')}\nЦена: {book.get('price')}")
+        await message.answer_photo(
+            photo=photo,
+            caption=f"Название:{book.get('name')}\nЦена: {book.get('price')}"
+        )
